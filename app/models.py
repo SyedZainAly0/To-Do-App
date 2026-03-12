@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from .database import Base
-
+from sqlalchemy import Enum
+import enum
 
 class User(Base):
 
@@ -20,6 +21,12 @@ class User(Base):
     tasks = relationship("Task", back_populates="owner", cascade="all, delete")
 
 
+class PriorityEnum(str, enum.Enum):
+    LOW = "LOW"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL",
+
+
 class Task(Base):
 
     __tablename__ = "tasks"
@@ -32,7 +39,7 @@ class Task(Base):
 
     is_completed = Column(Boolean, default=False)
 
-    priority = Column(Integer, default=1)
+    priority = Column(Enum(PriorityEnum), default=PriorityEnum.LOW)
 
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 

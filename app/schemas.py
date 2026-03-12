@@ -1,55 +1,57 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr , Field
 from typing import List, Optional
 
-# ---------------- USER SCHEMAS ----------------
 
-# This is the basic info about a user
+
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
 
-# Info needed when creating a new user (signup)
-class UserCreate(UserBase):
-    password: str
 
-# Info we send back after getting user data (response)
+class UserCreate(UserBase):
+    password: str = Field(min_length=8)
+
+
 class UserResponse(UserBase):
-    id: int                # user's ID in database
-    is_active: bool        # is the account active?
-    tasks: Optional[List["TaskResponse"]] = []  # list of tasks for this user
+
+    id: int
+    is_active: bool
+    tasks: Optional[List["TaskResponse"]] = []
 
     class Config:
-        orm_mode = True    # allows converting SQLAlchemy models to Pydantic easily
+        orm_mode = True
 
-# ---------------- LOGIN SCHEMAS ----------------
 
-# Info user sends to login
+
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-# Info we send back after successful login
+
 class LoginResponse(BaseModel):
     message: str
-    access_token: str  # JWT token
+    access_token: str
 
-# ---------------- TASK SCHEMAS ----------------
 
-# Basic task info
+
+
 class TaskBase(BaseModel):
     title: str
-    description: Optional[str] = None  # optional field
-    priority: Optional[int] = 1        # default priority is 1
+    description: Optional[str] = None
+    priority: Optional[int] = 1
 
-# Info needed to create a task
+
 class TaskCreate(TaskBase):
-    pass  # same as TaskBase
+    pass
 
-# Info we send back after getting task data
+
 class TaskResponse(TaskBase):
+
     id: int
     is_completed: bool
-    owner_id: int   # which user owns this task
+    owner_id: int
 
     class Config:
         orm_mode = True

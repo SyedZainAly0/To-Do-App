@@ -9,7 +9,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# ------------------ GET CURRENT USER ------------------
 
 def get_current_user(access_token: str = Cookie(None), db: Session = Depends(get_db)):
 
@@ -32,7 +31,7 @@ def get_current_user(access_token: str = Cookie(None), db: Session = Depends(get
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-# ------------------ SIGNUP ------------------
+
 
 @app.post("/signup")
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -46,7 +45,6 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return {"message": "User created successfully"}
 
 
-# ------------------ LOGIN ------------------
 
 @app.post("/login")
 def login(user: schemas.LoginRequest, response: Response, db: Session = Depends(get_db)):
@@ -62,13 +60,12 @@ def login(user: schemas.LoginRequest, response: Response, db: Session = Depends(
         key="access_token",
         value=token,
         httponly=True,
-        samesite="lax"  # optional, prevents CSRF in some cases
     )
 
     return {"message": "Login successful"}
 
 
-# ------------------ TASK ROUTES ------------------
+
 
 @app.post("/tasks")
 def create_task(
@@ -111,3 +108,11 @@ def delete_task(
         raise HTTPException(status_code=404, detail="Task not found")
     crud.delete_task(db, task_id)
     return {"message": "Task deleted successfully"}
+
+
+@app.post("/logout")
+def logout(response: Response):
+
+    response.delete_cookie("access_token")
+
+    return {"message": "Successfully logged out"}
